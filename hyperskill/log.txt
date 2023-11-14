@@ -1,0 +1,6 @@
+2021-02-15 03:18.57 [info]  response  code=200 elapsed=329.08
+2021-02-15 03:18.64 [info]  request   json={"make_a_problem": true}  url=https://some.site.org/api
+2021-02-15 03:18.77 [Error] response  code=500 elapsed=329.08
+2021-02-15 03:18.97 [error] response  code=400 elapsed=329.08
+2021-02-15 03:19.44 [info]  request   json={"make_a_problem": true}  url=https://some.site.org/api
+2021-02-15 03:19.47 [error] response  code=500 elapsed=329.08
