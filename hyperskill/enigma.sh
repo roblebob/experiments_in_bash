@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+SHIFT=3
 
 ord() {
   echo $(printf "%d\n" "'$1") 
@@ -10,63 +11,60 @@ chr() {
 }
 
 
-re_alpha="^[A-Z]$"
-re_int="^[0-9]$"
+echo "Type 'e' to encrypt, 'd' to decrypt a message:"
+echo "Enter a command:"
+read -r command
+if ! [[ ${command} == "e" || ${command} == "d" ]]; then
+    echo "Invalid command!"
+    exit
+fi
 
+re_message="^[A-Z ]+$"
 
-echo "Enter an uppercase letter:"
-read -a input
-uppercase_letter="${input[0]}"
-echo "Enter a key:"
-read -a input
-key="${input[0]}"
-
-if ! [[ ${uppercase_letter} =~ ${re_alpha}  &&  ${key} =~ ${re_int} ]]; then
-    echo "Invalid key or letter!"
+echo "Enter a message:"
+read -r message
+if ! [[ ${message} =~ ${re_message} ]]; then
+    echo "This is not a valid message!"
     exit
 fi
 
 
-ascii_val_start=$(ord "A")
-ascii_val_end=$(ord "Z")
-ascii_val=$(ord "$uppercase_letter")
 
-ascii_val_new=$((ascii_val + key))
- 
-if [ $ascii_val_new -gt $ascii_val_end ]; then
-    ascii_val_new=$((ascii_val_new - ascii_val_end + ascii_val_start - 1))
+if [[ ${command} == "e" ]]; then
+    shift=$SHIFT
+    response="Encrypted message:"
+else
+    shift=$((0 - SHIFT))
+    response="Decrypted message:"
 fi
 
 
-new_char=$(chr "$ascii_val_new")
+START=$(ord "A")
+END=$(ord "Z")
+length=${#message}
+new_message=""
 
-echo "Encrypted letter: ${new_char}"
+for (( i=0; i<${length}; i++ )); do
+    char=${message:$i:1}
 
+    if [[ ${char} == " " ]]; then
+        new_message="${new_message} "
+        continue
+    fi
 
-
-
-
-
-
-
-
-
-
-
-
-
+    val=$(ord "$char")
+    val=$((val + shift))
 
 
+    if [ $val -gt $END ]; then
+        val=$((val - END + START - 1))
+    elif [ $val -lt $START ]; then
+        val=$((val + END - START + 1))
+    fi
+
+    new_char=$(chr "$val")    
+    new_message="${new_message}${new_char}"
+done
 
 
-
-
-# write your code here
-# echo "Enter a message:"
-# read -r input
-# re="^[A-Z ]+$"
-# if [[ $input =~ $re ]]; then
-#     echo "This is a valid message!"
-# else
-#     echo "This is not a valid message!"
-# fi
+printf "${response}\n${new_message}\n"
