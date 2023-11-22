@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+SHIFT=3
+
 re_filename="^[a-zA-Z\.]+$"
 re_message="^[A-Z ]+$"
 
@@ -58,6 +60,59 @@ read_file() {
 }
 
 
+encrypt_decrypt_file(){
+
+
+    echo "Enter the filename:"
+    read -r filename_in
+    if [[ ! -f "${filename_in}" ]]; then
+        echo "File not found!"
+        return
+    fi
+
+    message=$(cat "${filename_in}")
+
+    if [[ $1 == "e" ]]; then
+        shift=$SHIFT
+        filename_out="${filename_in}.enc"
+    else
+        shift=$((0 - SHIFT)) 
+        filename_out="${filename_in::-4}"
+    fi
+
+    START=$(ord "A")
+    END=$(ord "Z")
+    length=${#message}
+    new_message=""
+
+    for (( i=0; i<${length}; i++ )); do
+        char=${message:$i:1}
+
+        if [[ ${char} == " " ]]; then
+            new_message="${new_message} "
+            continue
+        fi
+
+        val=$(ord "$char")
+        val=$((val + shift))
+
+
+        if [ $val -gt $END ]; then
+            val=$((val - END + START - 1))
+        elif [ $val -lt $START ]; then
+            val=$((val + END - START + 1))
+        fi
+
+        new_char=$(chr "$val")    
+        new_message="${new_message}${new_char}"
+    done
+
+    echo "${new_message}" > "${filename_out}"
+    rm "${filename_in}"
+    echo "Success"
+}
+
+
 
 while true; do
 
@@ -76,10 +131,14 @@ while true; do
             read_file
             continue
             ;;
-        "3" | "4" )
-            echo "Not implemented!"
+        "3" )
+            encrypt_decrypt_file "e"
             continue
             ;;
+        "4" )
+            encrypt_decrypt_file "d"
+            continue
+            ;;    
         * )
             echo "Invalid option!"
             continue
@@ -87,70 +146,3 @@ while true; do
     esac
 
 done
-
-
- 
-
-
-
-
-
-# SHIFT=3
-#
-# echo "Type 'e' to encrypt, 'd' to decrypt a message:"
-# echo "Enter a command:"
-# read -r command
-# if ! [[ ${command} == "e" || ${command} == "d" ]]; then
-#     echo "Invalid command!"
-#     exit
-# fi
-
-# re_message="^[A-Z ]+$"
-
-# echo "Enter a message:"
-# read -r message
-# if ! [[ ${message} =~ ${re_message} ]]; then
-#     echo "This is not a valid message!"
-#     exit
-# fi
-
-
-
-# if [[ ${command} == "e" ]]; then
-#     shift=$SHIFT
-#     response="Encrypted message:"
-# else
-#     shift=$((0 - SHIFT))
-#     response="Decrypted message:"
-# fi
-
-
-# START=$(ord "A")
-# END=$(ord "Z")
-# length=${#message}
-# new_message=""
-
-# for (( i=0; i<${length}; i++ )); do
-#     char=${message:$i:1}
-
-#     if [[ ${char} == " " ]]; then
-#         new_message="${new_message} "
-#         continue
-#     fi
-
-#     val=$(ord "$char")
-#     val=$((val + shift))
-
-
-#     if [ $val -gt $END ]; then
-#         val=$((val - END + START - 1))
-#     elif [ $val -lt $START ]; then
-#         val=$((val + END - START + 1))
-#     fi
-
-#     new_char=$(chr "$val")    
-#     new_message="${new_message}${new_char}"
-# done
-
-
-# printf "${response}\n${new_message}\n"
