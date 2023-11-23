@@ -1,7 +1,5 @@
 #!/usr/bin/bash
 
-SHIFT=3
-
 re_filename="^[a-zA-Z\.]+$"
 re_message="^[A-Z ]+$"
 
@@ -60,8 +58,9 @@ read_file() {
 }
 
 
-encrypt_decrypt_file(){
+encrypt_decrypt_file_caesar(){
 
+    SHIFT=3
 
     echo "Enter the filename:"
     read -r filename_in
@@ -114,6 +113,47 @@ encrypt_decrypt_file(){
 
 
 
+
+
+encrypt_decrypt_file_openssl(){
+
+
+    echo "Enter the filename:"
+    read -r filename_in
+    if [[ ! -f "${filename_in}" ]]; then
+        echo "File not found!"
+        return
+    fi
+
+    echo "Enter password:"
+    read -r password
+
+
+    if [[ $1 == "e" ]]; then
+        filename_out="${filename_in}.enc"
+    else
+        filename_out="${filename_in::-4}"
+    fi
+
+    if [[ $1 == "e" ]]; then
+        openssl enc -aes-256-cbc -e -pbkdf2 -nosalt -in "${filename_in}" -out "${filename_out}" -pass pass:"${password}" &> /dev/null
+    else
+        openssl enc -aes-256-cbc -d -pbkdf2 -nosalt -in "${filename_in}" -out "${filename_out}" -pass pass:"${password}" &> /dev/null
+    fi
+    exit_code=$?
+
+    if [[ $exit_code -ne 0 ]]; then
+        echo "Fail"
+    else
+        echo "Success"
+        rm "${filename_in}"
+    fi
+    
+}
+
+
+
+
 while true; do
 
     show_menue
@@ -132,11 +172,11 @@ while true; do
             continue
             ;;
         "3" )
-            encrypt_decrypt_file "e"
+            encrypt_decrypt_file_openssl "e"
             continue
             ;;
         "4" )
-            encrypt_decrypt_file "d"
+            encrypt_decrypt_file_openssl "d"
             continue
             ;;    
         * )
