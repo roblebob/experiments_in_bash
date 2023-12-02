@@ -112,6 +112,24 @@ file_and_dir_operations() {
 
 
 
+find_executables() {
+    echo
+    echo "Enter an executable name:"
+    read -r executable_name
+    message=$(which "$executable_name")
+    if [[ -z "$message" ]]; then
+        echo "The executable with that name does not exist!"
+        return
+    fi
+    echo "Located in: $message"
+    
+    echo "Enter arguments:"
+    read -r arguments
+    $executable_name $arguments
+}
+
+
+
 while true; do
 
     show_menue
@@ -133,12 +151,10 @@ while true; do
             file_and_dir_operations
             ;;
         "4" )
-            echo "Not implemented!"
-            continue
+            find_executables
             ;;
         * )
             echo "Invalid option!"
-            continue
             ;;
     esac
 
