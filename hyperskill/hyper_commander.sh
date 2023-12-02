@@ -16,8 +16,7 @@ show_menue() {
 }
 
 
-file_and_dir_operations() {
-    while true; do
+list_files_and_dirs() {
         echo
         echo "The list of files and directories:"
 
@@ -29,6 +28,13 @@ file_and_dir_operations() {
                 echo "D $item"
             fi 
         done
+}
+
+
+file_and_dir_operations() {
+    while true; do
+
+        list_files_and_dirs
 
         echo
         echo "---------------------------------------------------"
@@ -44,8 +50,50 @@ file_and_dir_operations() {
                 cd ..
                 ;;
             * )
-                if [[ -f "$file_and_dir_operations_menue" ]]; then
-                    echo "Not implemented!"
+                name="$file_and_dir_operations_menue"
+                if [[ -f "$name" ]]; then
+                    
+                    while true; do
+                        echo
+                        echo "---------------------------------------------------------------------"
+                        echo "| 0 Back | 1 Delete | 2 Rename | 3 Make writable | 4 Make read-only |"
+                        echo "---------------------------------------------------------------------"
+                        read -r file_and_dir_operations_menue_file
+
+                        case "$file_and_dir_operations_menue_file" in
+                            "0" )
+                                break
+                                ;;
+                            "1" )
+                                rm "$name"
+                                echo "${name} has been deleted."
+                                break
+                                ;;
+                            "2" )
+                                echo "Enter the new file name:"
+                                read -r new_name
+                                mv "$name" "$new_name"
+                                echo "${name} has been renamed as ${new_name}."
+                                break
+                                ;;
+                            "3" )
+                                chmod a+rw "$name"
+                                echo "Permissions have been updated."
+                                ls -l "$name"
+                                break
+                                ;;
+                            "4" )
+                                chmod a+rw "$name"
+                                chmod o-w "$name"
+                                echo "Permissions have been updated."
+                                ls -l "$name"
+                                break
+                                ;;
+                            * )
+                                continue
+                                ;;
+                        esac
+                    done
                     continue
 
                 elif [[ -d "$file_and_dir_operations_menue" ]]; then
