@@ -27,9 +27,10 @@ RANDOM(){
 }
 
 playing_game() {
+    login
     echo "What is your name?"
     read -r name
-    score=0
+    correct_answers=0
     while true; do
 
         question_and_answer=$(curl --silent --cookie cookie.txt --user "${username}:${password}" http://127.0.0.1:8000/game)
@@ -40,22 +41,44 @@ playing_game() {
         echo "True or False?"
         read -r user_answer
 
-        if [[ "$user_answer" != "$answer" ]]; then
+        if [[ "${user_answer,,}" != "${answer,,}" ]]; then
             echo "Wrong answer, sorry!"
-            echo "${name} you have ${score} correct answer(s)."
-            echo "Your score is $(($score * 10)) points."
+            echo "${name} you have ${correct_answers} correct answer(s)."
+            score=$((correct_answers * 10))
+            echo "Your score is ${score} points."
+            echo -e "User: ${name}, Score: ${score}, Date: $(date +'%Y-%m-%d')" >> scores.txt
             break
         fi
 
         idx=$((RANDOM % ${#WIN_RESPONSES[@]}))
         echo "${responses[$idx]}"
-        score=$((score + 1))
+        correct_answers=$((correct_answers + 1))
     done
 }
 
 
+
+display_scores() {
+    if ! [[ -f scores.txt ]]; then
+        echo "File not found or no scores in it!"
+        return
+    fi
+    echo "Player scores"
+    cat scores.txt
+}
+
+reset_scores() {
+    if ! [[ -f scores.txt ]]; then
+        echo "File not found or no scores in it!"
+        return
+    fi
+    rm scores.txt
+    echo "File deleted successfully!"
+}
+
+
 echo "Welcome to the True or False Game!" 
-login
+
 while true; do
 
     show_menue
@@ -69,7 +92,7 @@ while true; do
             playing_game
             ;;
         2 )
-            echo "Displaying scores"
+            display_scores
             ;;
         3 )
             echo "Resetting scores"
