@@ -1,3 +1,6 @@
-hallo first line
-second ...
-third
+data
+computer
+data
+database
+programmer
+DATA
